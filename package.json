@@ -1,0 +1,54 @@
+{
+  "name": "dsh-schnie-archive",
+  "version": "0.1.0",
+  "description": "SCHNIE knowledge retrieval and faithful source links for DeepSeek Harness; uses your existing model configuration.",
+  "type": "module",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/schrolemons/schnie-harness-plugin.git" },
+  "homepage": "https://github.com/schrolemons/schnie-harness-plugin#readme",
+  "engines": {
+    "node": ">=22.19.0",
+    "dsh": ">=0.2.1-rc.2 <0.3.0"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib/",
+    "locale/",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-chat",
+        "@deepseek-ai/dsh-client-ui-tool"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "check": "node --check index.js && node --check client.js && node --check lib/knowledge-client.js",
+    "pack:release": "npm pack --pack-destination release"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "vitest": "5.0.5"
+  }
+}
