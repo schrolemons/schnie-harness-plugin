@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Knowledge Retrieval",
+    "description": "Search your configured knowledge API and display sources actually cited in the answer. Uses the host model settings; configure your own endpoint before use."
+  }
+}

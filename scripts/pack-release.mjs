@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+const release=new URL('../release/',import.meta.url);
+fs.mkdirSync(release,{recursive:true});
+const npm=process.env.npm_execpath;
+if(!npm)throw new Error('Run this through npm run pack:release.');
+const check=spawnSync(process.execPath,['scripts/check-public.mjs'],{stdio:'inherit'});
+if(check.status!==0)process.exit(check.status||1);
+const result=spawnSync(process.execPath,[npm,'pack','--ignore-scripts','--json','--pack-destination',fileURLToPath(release)],{encoding:'utf8'});
+if(result.status!==0)throw new Error(result.stderr||'Package failed');
+const [pack]=JSON.parse(result.stdout);
+const bytes=fs.readFileSync(new URL(pack.filename,release));
+const checksum=createHash('sha256').update(bytes).digest('hex');
+fs.writeFileSync(new URL('SHA256SUMS.txt',release),`${checksum}  ${pack.filename}\n`);
+console.log(JSON.stringify({filename:pack.filename,sha256:checksum,files:pack.files.map(file=>file.path)},null,2));
