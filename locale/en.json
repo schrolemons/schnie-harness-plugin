@@ -1,11 +1,12 @@
 {
   "meta": {
-    "title": "External answers and source cards",
-    "description": "Connect a compatible SSE service to native DSH conversations, with persistent source cards. No RAG dependency."
+    "title": "Retrieval and source cards",
+    "description": "Retrieve evidence for the currently selected DSH session model and render validated source cards."
   },
   "config": {
-    "endpoint": "External SSE endpoint",
+    "endpoint": "Retrieval endpoint (default mode)",
     "accessToken": "Access token (optional)",
-    "timeoutMs": "Request deadline (ms)"
+    "timeoutMs": "Request deadline (ms)",
+    "mode": "Integration mode"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "dsh-schnie-archive",
-  "version": "0.3.0",
-  "description": "Native DeepSeek Harness conversation adapter for external SSE answers and source cards",
+  "version": "0.4.0",
+  "description": "Native DeepSeek Harness retrieval context and source cards using the current session model",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -59,11 +59,13 @@
     "demo:sse": "node examples/sse-server.mjs"
   },
   "peerDependencies": {
+    "@deepseek-ai/dsh-llm": ">=0.2.1-rc.2 <0.3.0",
     "@deepseek-ai/schemastery": "^3.18.5",
-    "@deepseek-ai/dsh-llm": ">=0.2.1-rc.2 <0.3.0"
+    "@deepseek-ai/dsh-session": ">=0.2.1-rc.2 <0.3.0"
   },
   "devDependencies": {
     "@deepseek-ai/dsh-llm": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-session": "0.2.1-rc.2",
     "@deepseek-ai/schemastery": "3.18.5",
     "esbuild": "0.28.2",
     "jsdom": "26.1.0",

@@ -34,6 +34,7 @@ __export(native_cards_exports, {
   SourceCards: () => SourceCards,
   apply: () => apply,
   cardsFromEvent: () => cardsFromEvent,
+  cardsFromRecord: () => cardsFromRecord,
   inject: () => inject,
   referenceDefinition: () => referenceDefinition
 });
@@ -82,6 +83,19 @@ function validateCards(value) {
 
 // ui/native-cards.js
 var KIND = "info-card-sources";
+var RECORD_TYPE = "plugin:dsh-schnie-archive/citations";
+function cardsFromRecord(event, record) {
+  try {
+    if (event?.type !== "assistant/message" || event.data?.interrupted || record?.type !== RECORD_TYPE || record.ignorable !== true) return [];
+    const data = record.data, source = event.data.message?.source;
+    if (data?.protocol !== "info-card-sse" || data.version !== 1 || typeof data.request_id !== "string" || !source || source.kind !== "model" || source.provider !== data.provider || source.model !== data.model || data.turn !== event.data.turn || data.step !== event.data.step) return [];
+    const text = event.data.message.content.filter((b) => b.type === "text").map((b) => b.text).join("");
+    if (text !== data.answer) return [];
+    return validateCards(data.info_card).filter((c) => c.used).sort((a, b) => a.order - b.order);
+  } catch {
+    return [];
+  }
+}
 function cardsFromEvent(event) {
   try {
     if (event?.type !== "assistant/message" || event.data?.interrupted) return [];
@@ -100,7 +114,7 @@ var referenceDefinition = {
   kind: KIND,
   target: "chat",
   match(event) {
-    if (!["step/start", "assistant/message", "llm/retry"].includes(event.type) || !Number.isSafeInteger(event.data?.turn) || !Number.isSafeInteger(event.data?.step)) return null;
+    if (!["step/start", "assistant/message", "llm/retry", RECORD_TYPE].includes(event.type) || !Number.isSafeInteger(event.data?.turn) || !Number.isSafeInteger(event.data?.step)) return null;
     return { id: `${event.data.turn}:${event.data.step}`, role: event.type === "step/start" ? "start" : "update" };
   },
   start() {
@@ -110,8 +124,11 @@ var referenceDefinition = {
     return context.state;
   },
   buildViewNode(context) {
-    const event = context.matches.at(-1)?.event ?? context.start?.event;
-    const cards = cardsFromEvent(event);
+    const events = [context.start?.event, ...context.matches.map((m) => m.event)].filter(Boolean);
+    const reset = events.findLastIndex((e) => e.type === "step/start" || e.type === "llm/retry");
+    const current = events.slice(reset + 1), event = current.findLast((e) => e.type === "assistant/message");
+    const record = current.findLast((e) => e.type === RECORD_TYPE);
+    const cards = record ? cardsFromRecord(event, record) : cardsFromEvent(event);
     return { key: context.key, id: context.id, kind: KIND, target: "chat", location: context.start?.location ?? context.matches.at(-1)?.location ?? { kind: "unresolved" }, groupTree: "turn", anchorSeq: (event?.seq ?? 0) + 1e-3, visibility: cards.length ? "visible" : "hidden", data: { cards } };
   }
 };

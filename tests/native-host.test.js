@@ -1,6 +1,7 @@
 import { expect,it } from 'vitest';
 import { Context } from '@deepseek-ai/cordis';
 import { LlmRuntime } from '@deepseek-ai/dsh-llm';
+import {SessionStore} from '@deepseek-ai/dsh-session';
 import * as plugin from '../index.js';
 import { createExampleServer } from '../examples/sse-server.mjs';
 import { once } from 'node:events';
@@ -9,7 +10,8 @@ it('实际Cordis与LLM注册表挂载、调用非RAG HTTP流并卸载',async()=>
  const ctx=new Context();
  try{
   await ctx.plugin(LlmRuntime,{});
-  const mounted=await ctx.plugin(plugin,{endpoint:`http://127.0.0.1:${server.address().port}/api/chat`,accessToken:'example-only-token'});
+  await ctx.plugin(SessionStore,{});
+  const mounted=await ctx.plugin(plugin,{mode:'external-sse',endpoint:`http://127.0.0.1:${server.address().port}/api/chat`,accessToken:'example-only-token'});
   const providers=await ctx.llm.listProviders();
   expect(providers.some(p=>p.id==='external-sse')).toBe(true);
   const chunks=[];

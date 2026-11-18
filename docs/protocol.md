@@ -51,3 +51,21 @@ data: {"request_id":"example-request-1","seq":3,"text_length":9,"card_count":1}
 仅展示used=true卡片，按order排序。正文可使用[1]等编号指向卡片。done.text_length是所有text_delta拼接后的Unicode码点数，card_count仅计used=true。最多10张卡片、64000个正文码点、1MiB响应；单个正文增量最长8192个UTF-16单元。流截断、重复卡片、编号跳跃、危险网址或计数不一致均不采纳卡片。
 
 RAG参考后端额外校验正文引用编号与模型采用声明一致，且卡片标题、网址来自本轮证据白名单。通用协议接收方只能校验数据结构，不能证明模型确实阅读或正确理解了来源。
+
+## 当前会话模型接入：info-card-evidence/1
+
+POST /api/retrieve仍使用message/request_id和可选Bearer令牌；不发送提供方、模型、模型Key、历史或系统提示词。响应为application/json：
+
+```json
+{"protocol":"info-card-evidence","version":1,"request_id":"example-request-1","sources":[{"id":"doc-1","title":"安装文档","url":"https://docs.example.com/setup","text":"先安装依赖。"}],"overview":"已生成的元数据总览"}
+```
+
+检索后端不调用LLM。DSH插件把问题与证据交给当前会话模型，并要求正文输出：
+
+```json
+{"answer":"先安装依赖。[1]","info_card":[{"id":"doc-1","used":true,"order":1}]}
+```
+
+模型不得填写标题、网址或摘要。插件从本次证据白名单补齐卡片，再校验正文引用和采用顺序。思考模式由DSH维持；模型思考内容不作为上述answer解析。
+
+证据响应最多1MiB、10条来源，总片段最多60000字符、每条最多6000字符；总览最多512KiB。格式错误、请求身份不符或危险网址会在进入模型前拒绝。该路径不要求把DSH模型密钥配置到RAG后端。
