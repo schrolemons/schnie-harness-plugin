@@ -32,7 +32,7 @@ npm run pack:release
 
 ```powershell
 $env:DSH_HOME = Join-Path $env:USERPROFILE '.dsh-rag-demo'
-npx @deepseek-ai/dsh@0.2.2-rc.1 plugin --profile web add /absolute/path/to/dsh-schnie-archive-0.4.0.tgz
+npx @deepseek-ai/dsh@0.2.2-rc.1 plugin --profile web add /absolute/path/to/dsh-schnie-archive-0.4.1.tgz
 npx @deepseek-ai/dsh@0.2.2-rc.1 --profile web --host 127.0.0.1 --port 3218
 ```
 
