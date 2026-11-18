@@ -1,7 +1,7 @@
 {
   "name": "dsh-schnie-archive",
-  "version": "0.2.0",
-  "description": "Configurable knowledge retrieval with source citations",
+  "version": "0.3.0",
+  "description": "Native DeepSeek Harness conversation adapter for external SSE answers and source cards",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -31,9 +31,10 @@
     "scripts/check-public.mjs",
     ".private-prompt-fingerprints.json",
     "scripts/pack-release.mjs",
-    "scripts/verify-dsh.mjs",
     "VALIDATION.md",
-    "docs/architecture.md"
+    "docs/architecture.md",
+    "protocol/",
+    "docs/protocol.md"
   ],
   "dsh": {
     "bundle": {
@@ -43,20 +44,28 @@
       "platform": "web",
       "immediately": true,
       "inject": [
-        "@deepseek-ai/dsh-client-ui-conversation",
-        "@deepseek-ai/dsh-client-ui-chat",
-        "@deepseek-ai/dsh-client-ui-tool"
+        "@deepseek-ai/dsh-client-ui-conversation"
       ]
     }
   },
   "scripts": {
     "test": "vitest run",
-    "check": "node --check index.js && node --check client.js && node --check lib/knowledge-client.js",
+    "check": "node scripts/check.mjs",
     "pack:release": "node scripts/pack-release.mjs",
     "privacy:check": "node scripts/check-public.mjs",
-    "privacy:history": "node scripts/check-public.mjs --history"
+    "privacy:history": "node scripts/check-public.mjs --history",
+    "build:client": "node scripts/build-client.mjs",
+    "prepack": "npm run build:client && npm run check",
+    "demo:sse": "node examples/sse-server.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": "^3.18.5",
+    "@deepseek-ai/dsh-llm": ">=0.2.1-rc.2 <0.3.0"
   },
   "devDependencies": {
+    "@deepseek-ai/dsh-llm": "0.2.1-rc.2",
+    "@deepseek-ai/schemastery": "3.18.5",
+    "esbuild": "0.28.2",
     "jsdom": "26.1.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",

@@ -1,6 +1,11 @@
 {
   "meta": {
-    "title": "Knowledge Retrieval",
-    "description": "Search your configured knowledge API and display sources actually cited in the answer. Uses the host model settings; configure your own endpoint before use."
+    "title": "External answers and source cards",
+    "description": "Connect a compatible SSE service to native DSH conversations, with persistent source cards. No RAG dependency."
+  },
+  "config": {
+    "endpoint": "External SSE endpoint",
+    "accessToken": "Access token (optional)",
+    "timeoutMs": "Request deadline (ms)"
   }
 }

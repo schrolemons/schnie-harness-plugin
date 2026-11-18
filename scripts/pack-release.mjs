@@ -6,6 +6,10 @@ const release=new URL('../release/',import.meta.url);
 fs.mkdirSync(release,{recursive:true});
 const npm=process.env.npm_execpath;
 if(!npm)throw new Error('Run this through npm run pack:release.');
+for(const script of ['scripts/build-client.mjs','scripts/check.mjs']){
+ const result=spawnSync(process.execPath,[script],{stdio:'inherit'});
+ if(result.status!==0)process.exit(result.status||1);
+}
 const check=spawnSync(process.execPath,['scripts/check-public.mjs'],{stdio:'inherit'});
 if(check.status!==0)process.exit(check.status||1);
 const result=spawnSync(process.execPath,[npm,'pack','--ignore-scripts','--json','--pack-destination',fileURLToPath(release)],{encoding:'utf8'});

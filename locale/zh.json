@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "外部问答与来源卡片",
+    "description": "接入支持info-card-sse/1的外部服务，在DSH原生会话中接收正文并展示引用卡片。无需绑定知识库或RAG。"
+  },
+  "config": {
+    "endpoint": "外部SSE接口地址",
+    "accessToken": "访问令牌（可选）",
+    "timeoutMs": "完整请求超时（毫秒）"
+  }
+}
