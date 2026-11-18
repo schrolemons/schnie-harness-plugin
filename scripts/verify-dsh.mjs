@@ -21,7 +21,10 @@ try{
  const mounted=await ctx.plugin(plugin,{endpoint:''});
  assert.ok(ctx.llm.listProviders().some(p=>p.id==='external-sse'));
  const chunks=[];
- await assert.rejects(async()=>{for await(const item of ctx.llm.stream({provider:'external-sse',model:'answer',messages:[{role:'user',content:[{type:'text',text:'configuration check'}]}]}))chunks.push(item);},{code:'SSE_NOT_CONFIGURED'});
+ let failure;
+ try{for await(const item of ctx.llm.stream({provider:'external-sse',model:'answer',messages:[{role:'user',source:{kind:'user'},content:[{type:'text',text:'configuration check'}]}]}))chunks.push(item);}catch(error){failure=error;}
+ // 0.2.1 throws adapter failures; 0.2.2 represents them as a finish outcome.
+ assert.equal(failure?.code??chunks.at(-1)?.reason?.failure?.code,'SSE_NOT_CONFIGURED');
  await mounted.dispose();assert.equal(ctx.llm.listProviders().length,0);
  console.log(JSON.stringify({ok:true,dsh:metadata.version,checks:['actual native LLM adapter registration','missing configuration fails without network','unload removes provider'],note:'No browser or model acceptance claim'}));
 }finally{await ctx.fiber.dispose();}
